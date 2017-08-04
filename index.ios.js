@@ -12,7 +12,28 @@ import {
   View
 } from 'react-native';
 
+import PouchDB from 'pouchdb-react-native';
+
+const localDB = new PouchDB('localEntries');
+
 export default class rememberThis extends Component {
+
+    componentDidMount() {
+        localDB.allDocs({include_docs: true})
+          .then(results => {
+            this.setState({
+                docs: results.rows.map(row => row.doc)
+            });
+          }).catch(err => console.log.bind(console, '[Fetch all]'));
+
+        localDB.changes({
+            live: true,
+            include_docs: true
+        }).on('change', console.log.bind(console, "Local Database Change"))
+          .on('complete', console.log.bind(console, '[Change:Complete]'))
+          .on('error', console.log.bind(console, '[Change:Error]'))
+    }
+
   render() {
     return (
       <View style={styles.container}>
