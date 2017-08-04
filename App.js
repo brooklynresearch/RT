@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
+  FlatList,
   TextInput,
   TouchableOpacity,
   View
@@ -18,7 +19,8 @@ export default class RememberThis extends Component {
         super(props)
         this.state = {
             text: "",
-            docs: []
+            docs: [],
+            debug: ""
         }
     }
 
@@ -26,48 +28,89 @@ export default class RememberThis extends Component {
         localDB.allDocs({include_docs: true})
           .then(results => {
             this.setState({
-                docs: results.rows.map(row => row.doc)
+                docs: results.rows
             });
           }).catch(err => console.log.bind(console, '[Fetch all]'));
 
         localDB.changes({
             live: true,
             include_docs: true
-        }).on('change', console.log.bind(console, "Local Database Change"))
+        }).on('change', this.setState.bind(this, {debug: "Local Database Change"}))
           .on('complete', console.log.bind(console, '[Change:Complete]'))
           .on('error', console.log.bind(console, '[Change:Error]'))
     }
 
     addItem() {
         console.log("[+} Adding item to local db")
+
+        let t = Date.now()
+        let b = this.state.text
+        localDB.put({_id: t, body: b})
+           .catch(this.setState.bind(this, {debug: '[!]Error inserting '}));
+
         this.setState({text: ""})
     }
 
     render() {
         return (
-          <View style={styles.container}>
 
-            <View style={styles.textEntryContainer}>
-                <TextInput
-                    style={styles.rememberText}
-                    value={this.state.text}
-                    onChangeText={(text) => this.setState({text})}
+          <View style={styles.mainContainer}>
+
+              <View style={styles.listContainer}>
+                <Text style={styles.debug}>{this.state.debug}</Text>
+                <FlatList
+                    data={this.state.docs}
+                    renderItem={
+                        ({item}) => <Text style={styles.item}>{item.body}</Text>
+                    }
                 />
-            </View>
+              </View>
 
-            <TouchableOpacity onPress={this.addItem.bind(this)}>
-                <View style={styles.button}>
-                    <Text style={styles.instructions}>
-                        Remember This
-                    </Text>
+              <View style={styles.inputContainer}>
+                <View style={styles.textEntryContainer}>
+                    <TextInput
+                        style={styles.rememberText}
+                        value={this.state.text}
+                        onChangeText={(text) => this.setState({text})}
+                    />
                 </View>
-            </TouchableOpacity>
+
+                <TouchableOpacity onPress={this.addItem.bind(this)}>
+                    <View style={styles.button}>
+                        <Text style={styles.buttonText}>
+                            Remember This
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+              </View>
           </View>
+
         );
     }
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    backgroundColor: '#000'
+  },
+  debug: {
+    fontSize: 16,
+    color: "green",
+    textAlign: 'left'
+  },
+  listContainer: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    backgroundColor: '#000'
+  },
+  item: {
+      fontSize: 16,
+      color: "#fff",
+      height: 20,
+      textAlign: 'left'
+  },
   rememberText: {
     color: "#000",
     height: 40,
@@ -77,7 +120,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10
   },
-  container: {
+  inputContainer: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
@@ -94,15 +137,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: "blue"
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    bottom: 10
-  },
-  instructions: {
+  buttonText: {
     fontSize: 40,
     textAlign: 'center',
     color: '#fff',
-  }
+  },
 });
 
