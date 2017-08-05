@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
-  FlatList,
+  ListView,
   TextInput,
   TouchableOpacity,
   View
@@ -17,52 +17,71 @@ export default class RememberThis extends Component {
 
     constructor(props) {
         super(props)
+
+        const ds = new ListView.DataSource({
+            rowHasChanged: (row1, row2) => row1 !== row2
+        });
+
         this.state = {
             text: "",
             docs: [],
             debug: ""
         }
-    }
 
-    componentDidMount() {
         localDB.allDocs({include_docs: true})
           .then(results => {
+            //this.setState({debug: '[+] Local db items: ' + results.rows});
             this.setState({
-                docs: results.rows
+                docs: ds.cloneWithRows(JSON.parse(results.rows))
             });
-          }).catch(err => console.log.bind(console, '[Fetch all]'));
+          }).catch(err => {
+              this.setState({debug: '[!] Error in local database: ' + err})
+          });
 
         localDB.changes({
             live: true,
             include_docs: true
-        }).on('change', this.setState.bind(this, {debug: "Local Database Change"}))
-          .on('complete', console.log.bind(console, '[Change:Complete]'))
-          .on('error', console.log.bind(console, '[Change:Error]'))
+        }).on('change', (change) => {
+            //this.setState({debug: "Local Database Change: " + change})
+          })
+          .on('complete', (info) => {
+              //this.setState({debug: '[+] OK -- updated local db: ' + info})
+          })
+          .on('error', (err) => {
+              this.setState({debug: '[!] Error updating local database: ' + err})
+          });
     }
 
     addItem() {
         console.log("[+} Adding item to local db")
 
-        let t = Date.now()
+        let t = Date.now().toString()
         let b = this.state.text
         localDB.put({_id: t, body: b})
-           .catch(this.setState.bind(this, {debug: '[!]Error inserting '}));
+           .then( (response) => {
+              this.setState({debug: '[+] OK -- added to local db: ' + response.id})
+           })
+           .catch( err => {
+               this.setState({debug: '[!] Error inserting item: ' + err})
+           });
 
         this.setState({text: ""})
     }
 
     render() {
+
         return (
 
           <View style={styles.mainContainer}>
 
               <View style={styles.listContainer}>
                 <Text style={styles.debug}>{this.state.debug}</Text>
-                <FlatList
-                    data={this.state.docs}
-                    renderItem={
-                        ({item}) => <Text style={styles.item}>{item.body}</Text>
+                <ListView
+                    dataSource={this.state.docs}
+                    renderRow={
+                        ({row}) => <Text style={styles.item}>{row}</Text>
                     }
+                    style={styles.itemlist}
                 />
               </View>
 
@@ -103,6 +122,8 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     justifyContent: 'flex-start',
+  },
+  itemlist: {
     backgroundColor: '#000'
   },
   item: {
