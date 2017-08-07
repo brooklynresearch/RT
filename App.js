@@ -13,36 +13,26 @@ import PouchDB from 'pouchdb-react-native';
 
 const localDB = new PouchDB('localEntries');
 
+const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.id !== r2.id});
+
 export default class RememberThis extends Component {
 
     constructor(props) {
         super(props)
 
-        const ds = new ListView.DataSource({
-            rowHasChanged: (row1, row2) => row1 !== row2
-        });
-
         this.state = {
             text: "",
-            docs: [],
+            docs: ds,
             debug: ""
         }
 
-        localDB.allDocs({include_docs: true})
-          .then(results => {
-            //this.setState({debug: '[+] Local db items: ' + results.rows});
-            this.setState({
-                docs: ds.cloneWithRows(JSON.parse(results.rows))
-            });
-          }).catch(err => {
-              this.setState({debug: '[!] Error in local database: ' + err})
-          });
-
         localDB.changes({
+            since: 'now',
             live: true,
             include_docs: true
-        }).on('change', (change) => {
-            //this.setState({debug: "Local Database Change: " + change})
+        }).on('change', () => {
+            this.updateList()
+            this.setState({debug: "Local Database Change"})
           })
           .on('complete', (info) => {
               //this.setState({debug: '[+] OK -- updated local db: ' + info})
@@ -50,10 +40,25 @@ export default class RememberThis extends Component {
           .on('error', (err) => {
               this.setState({debug: '[!] Error updating local database: ' + err})
           });
+
+          this.updateList();
+    }
+
+    updateList() {
+
+         localDB.allDocs({include_docs: true, descending: true})
+          .then(results => {
+            let items = results.rows.map(row => row.doc)
+            //this.setState({debug: '[+] Local db items: ' + items});
+            this.setState({
+                docs: ds.cloneWithRows(items)
+            });
+          }).catch(err => {
+              this.setState({debug: '[!] Error in local database: ' + err})
+          });
     }
 
     addItem() {
-        console.log("[+} Adding item to local db")
 
         let t = Date.now().toString()
         let b = this.state.text
@@ -68,6 +73,21 @@ export default class RememberThis extends Component {
         this.setState({text: ""})
     }
 
+    renderList() {
+
+        return (
+            <ListView
+                dataSource={this.state.docs}
+                renderRow={
+                    (row) =>
+                      <Text style={styles.item}>{row.body}</Text>
+                }
+                enableEmptySections={true}
+                style={styles.itemlist}
+            />
+       )
+    }
+
     render() {
 
         return (
@@ -76,13 +96,7 @@ export default class RememberThis extends Component {
 
               <View style={styles.listContainer}>
                 <Text style={styles.debug}>{this.state.debug}</Text>
-                <ListView
-                    dataSource={this.state.docs}
-                    renderRow={
-                        ({row}) => <Text style={styles.item}>{row}</Text>
-                    }
-                    style={styles.itemlist}
-                />
+                {this.renderList()}
               </View>
 
               <View style={styles.inputContainer}>
@@ -104,7 +118,7 @@ export default class RememberThis extends Component {
               </View>
           </View>
 
-        );
+        )
     }
 }
 
