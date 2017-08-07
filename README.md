@@ -13,5 +13,5 @@ npm install
 ```
 ## Running on Device or Emulator
 
-[Follow directions for your OS and target device] (https://facebook.github.io/react-native/docs/getting-started.html "Official Docs")
+[Follow directions for your OS and target device](https://facebook.github.io/react-native/docs/getting-started.html "Official Docs")
 
