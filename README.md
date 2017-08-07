@@ -12,5 +12,6 @@ Then, in the project folder:
 npm install
 ```
 ## Running on Device or Emulator
-[Follow directions for your OS and target device] (https://facebook.github.io/react-native/docs/getting-started.html)
+
+[Follow directions for your OS and target device] (https://facebook.github.io/react-native/docs/getting-started.html "Official Docs")
 
