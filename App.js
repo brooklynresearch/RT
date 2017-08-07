@@ -91,7 +91,6 @@ export default class RememberThis extends Component {
     render() {
 
         return (
-
           <View style={styles.mainContainer}>
 
               <View style={styles.listContainer}>
@@ -117,7 +116,6 @@ export default class RememberThis extends Component {
                 </TouchableOpacity>
               </View>
           </View>
-
         )
     }
 }
@@ -134,7 +132,7 @@ const styles = StyleSheet.create({
     textAlign: 'left'
   },
   listContainer: {
-    flex: 1,
+    flex: 3,
     justifyContent: 'flex-start',
   },
   itemlist: {
