@@ -32,10 +32,10 @@ export default class RememberThis extends Component {
             include_docs: true
         }).on('change', () => {
             this.updateList()
-            this.setState({debug: "Local Database Change"})
+            //this.setState({debug: "Local Database Change"})
           })
           .on('complete', (info) => {
-              //this.setState({debug: '[+] OK -- updated local db: ' + info})
+              //disconnect
           })
           .on('error', (err) => {
               this.setState({debug: '[!] Error updating local database: ' + err})
@@ -73,6 +73,19 @@ export default class RememberThis extends Component {
         this.setState({text: ""})
     }
 
+    deleteItem(row) {
+
+        localDB.remove(row)
+            .then( response => {
+                if (response.ok === true) {
+                    this.setState({debug: "[+] OK -- Deleted: " + row._id})
+                }
+            })
+            .catch( err => {
+                this.setState({debug: "[!] Error deleting item: " + err})
+            });
+    }
+
     renderList() {
 
         return (
@@ -80,7 +93,14 @@ export default class RememberThis extends Component {
                 dataSource={this.state.docs}
                 renderRow={
                     (row) =>
+                      <View style={styles.row}>
                       <Text style={styles.item}>{row.body}</Text>
+                          <TouchableOpacity onPress={this.deleteItem.bind(this, row)}>
+                            <View style={styles.deleteBtn}>
+                                <Text style={styles.delete}>X</Text>
+                            </View>
+                          </TouchableOpacity>
+                      </View>
                 }
                 enableEmptySections={true}
                 style={styles.itemlist}
@@ -139,33 +159,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#000'
   },
   item: {
-      fontSize: 16,
+      fontSize: 40,
       color: "#fff",
-      height: 20,
+      height: 52,
       textAlign: 'left'
   },
   rememberText: {
     color: "#000",
-    height: 40,
-    borderColor: 'gray',
+    borderColor: 'blue',
+    lineHeight: 40,
     borderWidth: 2,
     fontSize: 20,
     textAlign: 'center',
-    margin: 10
   },
   inputContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000'
   },
   textEntryContainer: {
     width: "100%",
+    top: "5%",
     backgroundColor: "#fff",
     bottom: "2%"
   },
   button: {
     width: "100%",
+    top: 10,
+    borderColor: "blue",
+    borderWidth: 2,
+    bottom: "10%",
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: "blue"
@@ -175,5 +199,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff',
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  deleteBtn: {
+    backgroundColor: "white",
+    justifyContent: 'center'
+  },
+  delete: {
+    color: "red",
+    fontSize: 40,
+  }
 });
 
