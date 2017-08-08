@@ -78,7 +78,7 @@ export default class RememberThis extends Component {
         localDB.remove(row)
             .then( response => {
                 if (response.ok === true) {
-                    this.setState({debug: "[+] Deleted: " + row._id})
+                    this.setState({debug: "[+] OK -- Deleted: " + row._id})
                 }
             })
             .catch( err => {
@@ -166,26 +166,30 @@ const styles = StyleSheet.create({
   },
   rememberText: {
     color: "#000",
-    height: 40,
-    borderColor: 'gray',
+    borderColor: 'blue',
+    lineHeight: 40,
     borderWidth: 2,
     fontSize: 20,
     textAlign: 'center',
-    margin: 10
   },
   inputContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000'
   },
   textEntryContainer: {
     width: "100%",
+    top: "5%",
     backgroundColor: "#fff",
     bottom: "2%"
   },
   button: {
     width: "100%",
+    top: 10,
+    borderColor: "blue",
+    borderWidth: 2,
+    bottom: "10%",
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: "blue"
