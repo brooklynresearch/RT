@@ -9,6 +9,9 @@ import {
   View
 } from 'react-native';
 
+import RememberList from './rememberList';
+import NewEntryInput from './NewEntryInput';
+
 import PouchDB from 'pouchdb-react-native';
 
 const localDB = new PouchDB('localEntries');
@@ -68,10 +71,10 @@ export default class RememberThis extends Component {
           });
     }
 
-    addItem() {
+    addItem(text) {
 
         let t = Date.now().toString()
-        let b = this.state.text
+        let b = text
         localDB.put({_id: t, body: b})
            .then( (response) => {
               this.setState({debug: '[+] OK -- added to local db: ' + response.id})
@@ -79,8 +82,6 @@ export default class RememberThis extends Component {
            .catch( err => {
                this.setState({debug: '[!] Error inserting item: ' + err})
            });
-
-        this.setState({text: ""})
     }
 
     deleteItem(row) {
@@ -96,55 +97,21 @@ export default class RememberThis extends Component {
             });
     }
 
-    renderList() {
-
-        return (
-            <ListView
-                dataSource={this.state.docs}
-                renderRow={
-                    (row) =>
-                      <View style={styles.row}>
-                      <Text style={styles.item}>{row.body}</Text>
-                          <TouchableOpacity onPress={this.deleteItem.bind(this, row)}>
-                            <View style={styles.deleteBtn}>
-                                <Text style={styles.delete}>X</Text>
-                            </View>
-                          </TouchableOpacity>
-                      </View>
-                }
-                enableEmptySections={true}
-                style={styles.itemlist}
-            />
-       )
-    }
-
     render() {
 
         return (
           <View style={styles.mainContainer}>
 
-              <View style={styles.listContainer}>
-                <Text style={styles.debug}>{this.state.debug}</Text>
-                {this.renderList()}
-              </View>
+              <Text style={styles.debug}>{this.state.debug}</Text>
 
-              <View style={styles.inputContainer}>
-                <View style={styles.textEntryContainer}>
-                    <TextInput
-                        style={styles.rememberText}
-                        value={this.state.text}
-                        onChangeText={(text) => this.setState({text})}
-                    />
-                </View>
+              <RememberList
+                  docs={this.state.docs}
+                  onDelete={this.deleteItem.bind(this)}
+              />
 
-                <TouchableOpacity onPress={this.addItem.bind(this)}>
-                    <View style={styles.button}>
-                        <Text style={styles.buttonText}>
-                            Remember This
-                        </Text>
-                    </View>
-                </TouchableOpacity>
-              </View>
+              <NewEntryInput
+                  onComplete={this.addItem.bind(this)}
+              />
           </View>
         )
     }
@@ -161,65 +128,5 @@ const styles = StyleSheet.create({
     color: "green",
     textAlign: 'left'
   },
-  listContainer: {
-    flex: 3,
-    justifyContent: 'flex-start',
-  },
-  itemlist: {
-    backgroundColor: '#000'
-  },
-  item: {
-      fontSize: 40,
-      color: "#fff",
-      height: 52,
-      textAlign: 'left'
-  },
-  rememberText: {
-    color: "#000",
-    borderColor: 'blue',
-    lineHeight: 40,
-    borderWidth: 2,
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000'
-  },
-  textEntryContainer: {
-    width: "100%",
-    top: "5%",
-    backgroundColor: "#fff",
-    bottom: "2%"
-  },
-  button: {
-    width: "100%",
-    top: 10,
-    borderColor: "blue",
-    borderWidth: 2,
-    bottom: "10%",
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: "blue"
-  },
-  buttonText: {
-    fontSize: 40,
-    textAlign: 'center',
-    color: '#fff',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  deleteBtn: {
-    backgroundColor: "white",
-    justifyContent: 'center'
-  },
-  delete: {
-    color: "red",
-    fontSize: 40,
-  }
 });
 
