@@ -12,6 +12,7 @@ import {
 import PouchDB from 'pouchdb-react-native';
 
 const localDB = new PouchDB('localEntries');
+const remoteDB = new PouchDB('http://192.168.0.174:5984/remember');
 
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.id !== r2.id});
 
@@ -41,7 +42,16 @@ export default class RememberThis extends Component {
               this.setState({debug: '[!] Error updating local database: ' + err})
           });
 
-          this.updateList();
+       localDB.sync(remoteDB, {
+         live: true,
+         retry: true
+       }).on('change', (info) => {
+           this.setState({debug: "[+] Remote database change: " + info.change.start_time})
+       }).on('error', (err) => {
+           this.setState({debug: "[!] Remote database error: " + err})
+       });
+
+      this.updateList();
     }
 
     updateList() {
