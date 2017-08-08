@@ -139,9 +139,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#000'
   },
   item: {
-      fontSize: 16,
+      fontSize: 40,
       color: "#fff",
-      height: 20,
+      height: 52,
       textAlign: 'left'
   },
   rememberText: {
