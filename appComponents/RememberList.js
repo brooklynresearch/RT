@@ -25,7 +25,9 @@ export default class RememberList extends Component {
     renderRow(row) {
         return (
            <View style={styles.row}>
-              <Text style={styles.entry}>{row.body}</Text>
+              <TouchableOpacity onPress={this.props.onSelect}>
+                  <Text style={styles.entry}>{row.body}</Text>
+              </TouchableOpacity>
               <TouchableOpacity onPress={this._onDelete(row)}>
                 <View style={styles.deleteBtn}>
                     <Text style={styles.delete}>X</Text>

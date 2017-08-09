@@ -9,8 +9,9 @@ import {
 
 import { StackNavigator } from 'react-navigation';
 
-import RememberList from './RememberList';
-import NewEntryInput from './NewEntryInput';
+import RememberList from './appComponents/RememberList';
+import NewEntryInput from './appComponents/NewEntryInput';
+import UpdateEntryScreen from './appComponents/UpdateEntryScreen';
 
 import PouchDB from 'pouchdb-react-native';
 
@@ -100,6 +101,8 @@ class Homescreen extends Component {
 
     render() {
 
+        const { navigate } = this.props.navigation
+
         return (
           <View style={styles.mainContainer}>
 
@@ -107,6 +110,7 @@ class Homescreen extends Component {
 
               <RememberList
                   docs={this.state.docs}
+                  onSelect={() => navigate('Update')}
                   onDelete={this.deleteItem.bind(this)}
               />
 
@@ -132,7 +136,8 @@ const styles = StyleSheet.create({
 })
 
 const RememberApp = StackNavigator({
-    Home: {screen: Homescreen}
+    Home: {screen: Homescreen},
+    Update: {screen: UpdateEntryScreen}
 })
 
 AppRegistry.registerComponent('rememberThis', () => RememberApp);
