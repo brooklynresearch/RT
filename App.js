@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 
 import {
+  AppRegistry,
   StyleSheet,
   Text,
   View
 } from 'react-native';
+
+import { StackNavigator } from 'react-navigation';
 
 import RememberList from './RememberList';
 import NewEntryInput from './NewEntryInput';
@@ -14,7 +17,11 @@ import PouchDB from 'pouchdb-react-native';
 const localDB = new PouchDB('localEntries');
 const remoteDB = new PouchDB('http://192.168.0.174:5984/remember');
 
-export default class RememberThis extends Component {
+class Homescreen extends Component {
+
+    static navigationOptions = {
+          header: null
+    }
 
     constructor(props) {
         super(props)
@@ -122,5 +129,11 @@ const styles = StyleSheet.create({
     color: "green",
     textAlign: 'left'
   },
-});
+})
+
+const RememberApp = StackNavigator({
+    Home: {screen: Homescreen}
+})
+
+AppRegistry.registerComponent('rememberThis', () => RememberApp);
 
