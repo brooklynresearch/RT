@@ -3,21 +3,16 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
-  ListView,
-  TextInput,
-  TouchableOpacity,
   View
 } from 'react-native';
 
-import RememberList from './rememberList';
+import RememberList from './RememberList';
 import NewEntryInput from './NewEntryInput';
 
 import PouchDB from 'pouchdb-react-native';
 
 const localDB = new PouchDB('localEntries');
 const remoteDB = new PouchDB('http://192.168.0.174:5984/remember');
-
-const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.id !== r2.id});
 
 export default class RememberThis extends Component {
 
@@ -26,7 +21,7 @@ export default class RememberThis extends Component {
 
         this.state = {
             text: "",
-            docs: ds,
+            docs: [],
             debug: ""
         }
 
@@ -61,10 +56,9 @@ export default class RememberThis extends Component {
 
          localDB.allDocs({include_docs: true, descending: true})
           .then(results => {
-            let items = results.rows.map(row => row.doc)
             //this.setState({debug: '[+] Local db items: ' + items});
             this.setState({
-                docs: ds.cloneWithRows(items)
+                docs: results.rows.map(row => row.doc)
             });
           }).catch(err => {
               this.setState({debug: '[!] Error in local database: ' + err})

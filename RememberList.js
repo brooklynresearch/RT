@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+
 import {
   StyleSheet,
   Text,
@@ -10,13 +12,21 @@ import {
 export default class RememberList extends Component {
     constructor(props) {
         super(props)
+
+        this.dataSource = new ListView.DataSource(
+            {rowHasChanged: (r1, r2) => r1.id !== r2.id}
+        );
+    }
+
+    _onDelete(row) {
+        return () => this.props.onDelete(row)
     }
 
     renderRow(row) {
         return (
            <View style={styles.row}>
               <Text style={styles.entry}>{row.body}</Text>
-              <TouchableOpacity onPress={this.props.onDelete(row)}>
+              <TouchableOpacity onPress={this._onDelete(row)}>
                 <View style={styles.deleteBtn}>
                     <Text style={styles.delete}>X</Text>
                 </View>
@@ -26,11 +36,13 @@ export default class RememberList extends Component {
     }
 
     render() {
+       let ds = this.dataSource.cloneWithRows(this.props.docs);
+
         return (
           <View style={styles.listContainer}>
               <ListView
-                  dataSource={this.props.docs}
-                  renderRow={this.renderRow}
+                  dataSource={ds}
+                  renderRow={this.renderRow.bind(this)}
                   enableEmptySections={true}
                   style={styles.entryList}
               />

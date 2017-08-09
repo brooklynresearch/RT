@@ -1,6 +1,9 @@
+import React, { Component } from 'react';
+
 import {
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -30,7 +33,7 @@ export default class NewEntryInput extends Component {
                 />
             </View>
 
-            <TouchableOpacity onPress={this._addItem}>
+            <TouchableOpacity onPress={this._addItem.bind(this)}>
                 <View style={styles.button}>
                     <Text style={styles.buttonText}>
                         Remember This
