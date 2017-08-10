@@ -1,20 +1,28 @@
 import React, { Component } from 'react';
 
 import {
+  AppRegistry,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
-import RememberList from './RememberList';
-import NewEntryInput from './NewEntryInput';
+import { StackNavigator } from 'react-navigation';
+
+import RememberList from './appComponents/RememberList';
+import NewEntryInput from './appComponents/NewEntryInput';
+import UpdateEntryScreen from './appComponents/UpdateEntryScreen';
 
 import PouchDB from 'pouchdb-react-native';
 
 const localDB = new PouchDB('localEntries');
 const remoteDB = new PouchDB('http://192.168.0.174:5984/remember');
 
-export default class RememberThis extends Component {
+class Homescreen extends Component {
+
+    static navigationOptions = {
+          header: null
+    }
 
     constructor(props) {
         super(props)
@@ -91,7 +99,14 @@ export default class RememberThis extends Component {
             });
     }
 
+    updateItem(row) {
+        let {navigate} = this.props.navigation
+        navigate('Update', {doc: row})
+    }
+
     render() {
+
+        const { navigate } = this.props.navigation
 
         return (
           <View style={styles.mainContainer}>
@@ -100,6 +115,7 @@ export default class RememberThis extends Component {
 
               <RememberList
                   docs={this.state.docs}
+                  onSelect={this.updateItem.bind(this)}
                   onDelete={this.deleteItem.bind(this)}
               />
 
@@ -122,5 +138,12 @@ const styles = StyleSheet.create({
     color: "green",
     textAlign: 'left'
   },
-});
+})
+
+const RememberApp = StackNavigator({
+    Home: {screen: Homescreen},
+    Update: {screen: UpdateEntryScreen}
+})
+
+AppRegistry.registerComponent('rememberThis', () => RememberApp);
 
