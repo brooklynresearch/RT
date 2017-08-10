@@ -22,10 +22,14 @@ export default class RememberList extends Component {
         return () => this.props.onDelete(row)
     }
 
+    _onSelect(row) {
+        return () => this.props.onSelect(row)
+    }
+
     renderRow(row) {
         return (
            <View style={styles.row}>
-              <TouchableOpacity onPress={this.props.onSelect}>
+              <TouchableOpacity onPress={this._onSelect(row)}>
                   <Text style={styles.entry}>{row.body}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={this._onDelete(row)}>

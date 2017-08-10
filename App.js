@@ -99,6 +99,11 @@ class Homescreen extends Component {
             });
     }
 
+    updateItem(row) {
+        let {navigate} = this.props.navigation
+        navigate('Update', {doc: row})
+    }
+
     render() {
 
         const { navigate } = this.props.navigation
@@ -110,7 +115,7 @@ class Homescreen extends Component {
 
               <RememberList
                   docs={this.state.docs}
-                  onSelect={() => navigate('Update')}
+                  onSelect={this.updateItem.bind(this)}
                   onDelete={this.deleteItem.bind(this)}
               />
 

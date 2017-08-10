@@ -8,10 +8,16 @@ import {
 } from 'react-native';
 
 export default class UpdateEntryScreen extends Component {
+
+    constructor(props) {
+        super(props)
+    }
+
     render() {
+        const {params} = this.props.navigation.state
         return (
             <View style={styles.container}>
-                <Text style={styles.test}>UPDATE SCREEN</Text>
+                <Text style={styles.text}>{params.doc.body}</Text>
             </View>
         )
     }
@@ -22,8 +28,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#000"
     },
-    test: {
-        fontSize: 16,
+    text: {
+        fontSize: 40,
         color: "#fff"
     }
 })
