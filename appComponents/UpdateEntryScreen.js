@@ -3,10 +3,12 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   TextInput,
+  Text,
   TouchableOpacity,
   Image,
   View
 } from 'react-native';
+import Camera from 'react-native-camera';
 
 const lockOpen = require('../img/ic_lock_open_white_24dp.png')
 const lockClosed = require('../img/ic_lock_white_24dp.png')
@@ -17,9 +19,12 @@ export default class UpdateEntryScreen extends Component {
     constructor(props) {
         super(props)
 
+        this.camera = null
+
         this.state = {
             editingText: false,
             text: "",
+            cameraActive: false
         }
     }
 
@@ -31,6 +36,31 @@ export default class UpdateEntryScreen extends Component {
     toggleEdit() {
         this.setState({editingText: !this.state.editingText})
         this.refs.TextEdit.focus()
+    }
+
+    toggleCamera() {
+        this.setState({cameraActive: !this.state.cameraActive})
+    }
+
+    renderCameraOff() {
+        return (
+            <TouchableOpacity onPress={this.toggleCamera.bind(this)}>
+                <Image
+                    source={require('../img/ic_add_a_photo_white_48dp.png')}
+                />
+            </TouchableOpacity>
+       )
+    }
+
+    renderCameraOn() {
+        return (
+            <Camera
+                ref="Camera"
+                style={styles.cameraPreview}
+                aspect="fill"
+                defaultTouchToFocus>
+            </Camera>
+       )
     }
 
     render() {
@@ -61,9 +91,7 @@ export default class UpdateEntryScreen extends Component {
                     </View>
                 </View>
                 <View style={styles.cameraPort}>
-                    <Image
-                        source={require('../img/ic_add_a_photo_white_48dp.png')}
-                    />
+                    {this.state.cameraActive ? this.renderCameraOn() : this.renderCameraOff()}
                 </View>
             </View>
         )
@@ -102,9 +130,16 @@ const styles = StyleSheet.create({
     },
     cameraPort: {
         flex: 2,
-        backgroundColor: "#999",
+        //backgroundColor: "#999",
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    cameraPreview: {
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        alignItems: 'center',
+        justifyContent: 'flex-end'
     }
 })
 
