@@ -10,6 +10,7 @@ import {
 
 const lockOpen = require('../img/ic_lock_open_white_24dp.png')
 const lockClosed = require('../img/ic_lock_white_24dp.png')
+const save = require('../img/ic_save_white_36dp.png')
 
 export default class UpdateEntryScreen extends Component {
 
@@ -17,8 +18,14 @@ export default class UpdateEntryScreen extends Component {
         super(props)
 
         this.state = {
-            editingText: false
+            editingText: false,
+            text: "",
+            doc: null
         }
+    }
+
+    save(doc) {
+        this.props.navigation.goBack()
     }
 
     toggleEdit() {
@@ -28,6 +35,8 @@ export default class UpdateEntryScreen extends Component {
 
     render() {
         const {params} = this.props.navigation.state
+        //this.setState({doc: params.doc})
+
         return (
             <View style={styles.container}>
                 <View style={styles.textArea}>
@@ -35,12 +44,22 @@ export default class UpdateEntryScreen extends Component {
                         ref="TextEdit"
                         value={params.doc.body}
                         editable={this.state.editingText}
+                        onChangeText={(text) => this.setState({text})}
                     />
-                    <TouchableOpacity style={styles.editBtn} onPress={this.toggleEdit.bind(this)}>
-                        <Image
-                            source={this.state.editingText ? lockOpen : lockClosed}
-                        />
-                    </TouchableOpacity>
+                    <View style={styles.buttonArea}>
+                        <TouchableOpacity style={styles.saveBtn}
+                            onPress={this.save.bind(this,params.doc)}>
+                            <Image
+                                source={save}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.editBtn}
+                            onPress={this.toggleEdit.bind(this)}>
+                            <Image
+                                source={this.state.editingText ? lockOpen : lockClosed}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 <View style={styles.cameraPort}>
                     <Image
@@ -68,11 +87,19 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: "#fff"
     },
+    buttonArea: {
+        flex: 1,
+        justifyContent: 'space-around',
+    },
+    saveBtn: {
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        right: "5%"
+    },
     editBtn: {
         justifyContent: 'center',
         alignItems: 'flex-end',
         right: "5%",
-        flex: 1,
     },
     cameraPort: {
         flex: 2,

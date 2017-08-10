@@ -86,6 +86,18 @@ class Homescreen extends Component {
            });
     }
 
+    updateItem(doc) {
+        localDB.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            body: doc.body
+        }).then( response => {
+            this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
+        }).catch( err => {
+            this.setState({debug: '[!] Error updating item: ' + err})
+        })
+    }
+
     deleteItem(row) {
 
         localDB.remove(row)
@@ -99,7 +111,7 @@ class Homescreen extends Component {
             });
     }
 
-    updateItem(row) {
+    selectItem(row) {
         let {navigate} = this.props.navigation
         navigate('Update', {doc: row})
     }
@@ -115,7 +127,7 @@ class Homescreen extends Component {
 
               <RememberList
                   docs={this.state.docs}
-                  onSelect={this.updateItem.bind(this)}
+                  onSelect={this.selectItem.bind(this)}
                   onDelete={this.deleteItem.bind(this)}
               />
 
