@@ -86,11 +86,11 @@ class Homescreen extends Component {
            });
     }
 
-    updateItem(doc) {
+    updateItem(doc, newText) {
         localDB.put({
             _id: doc._id,
             _rev: doc._rev,
-            body: doc.body
+            body: newText
         }).then( response => {
             this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
         }).catch( err => {
@@ -113,7 +113,10 @@ class Homescreen extends Component {
 
     selectItem(row) {
         let {navigate} = this.props.navigation
-        navigate('Update', {doc: row})
+        navigate('Update', {
+            doc: row,
+            updateFn: this.updateItem.bind(this)
+        })
     }
 
     render() {

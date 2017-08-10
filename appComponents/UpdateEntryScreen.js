@@ -20,11 +20,11 @@ export default class UpdateEntryScreen extends Component {
         this.state = {
             editingText: false,
             text: "",
-            doc: null
         }
     }
 
     save(doc) {
+        this.props.navigation.state.params.updateFn(doc, this.state.text)
         this.props.navigation.goBack()
     }
 
@@ -35,20 +35,19 @@ export default class UpdateEntryScreen extends Component {
 
     render() {
         const {params} = this.props.navigation.state
-        //this.setState({doc: params.doc})
 
         return (
             <View style={styles.container}>
                 <View style={styles.textArea}>
                     <TextInput style={styles.docText}
                         ref="TextEdit"
-                        value={params.doc.body}
+                        defaultValue={params.doc.body}
                         editable={this.state.editingText}
                         onChangeText={(text) => this.setState({text})}
                     />
                     <View style={styles.buttonArea}>
                         <TouchableOpacity style={styles.saveBtn}
-                            onPress={this.save.bind(this,params.doc)}>
+                            onPress={this.save.bind(this, params.doc)}>
                             <Image
                                 source={save}
                             />
