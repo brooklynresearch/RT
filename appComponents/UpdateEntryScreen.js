@@ -59,6 +59,13 @@ export default class UpdateEntryScreen extends Component {
                 style={styles.cameraPreview}
                 aspect="fill"
                 defaultTouchToFocus>
+                    <TouchableOpacity
+                      style={styles.closeBtn}
+                      onPress={this.toggleCamera.bind(this)}>
+                        <Image
+                            source={require('../img/ic_clear_white_36dp.png')}
+                        />
+                    </TouchableOpacity>
             </Camera>
        )
     }
@@ -138,8 +145,15 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
         height: "100%",
-        alignItems: 'center',
+        flexDirection: 'row',
+        //alignItems: 'center',
         justifyContent: 'flex-end'
+    },
+    closeBtn: {
+        backgroundColor: "#888",
+        height: "10%",
+        alignItems: 'center',
+        justifyContent: 'flex-start'
     }
 })
 
