@@ -13,6 +13,7 @@ import Camera from 'react-native-camera';
 const lockOpen = require('../img/ic_lock_open_white_24dp.png')
 const lockClosed = require('../img/ic_lock_white_24dp.png')
 const save = require('../img/ic_save_white_36dp.png')
+const blank = require('../img/ic_add_a_photo_white_48dp.png')
 
 export default class UpdateEntryScreen extends Component {
 
@@ -24,7 +25,9 @@ export default class UpdateEntryScreen extends Component {
         this.state = {
             editingText: false,
             text: "",
-            cameraActive: false
+            cameraActive: false,
+            imageAttachment: null,
+            debug: ""
         }
     }
 
@@ -42,11 +45,30 @@ export default class UpdateEntryScreen extends Component {
         this.setState({cameraActive: !this.state.cameraActive})
     }
 
+    capture() {
+        if (this.camera) {
+
+            this.camera.capture()
+            .then( data  => {
+                this.setState({debug: data.path})
+                this.setState({imageAttachment: data.path})
+                this.toggleCamera()
+            })
+            .catch(err => {
+                this.setState({debug: err})
+            })
+       }
+    }
+
     renderCameraOff() {
+
         return (
             <TouchableOpacity onPress={this.toggleCamera.bind(this)}>
                 <Image
-                    source={require('../img/ic_add_a_photo_white_48dp.png')}
+                    style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
+                    source={
+                        this.state.imageAttachment ? {uri: this.state.imageAttachment} : blank
+                    }
                 />
             </TouchableOpacity>
        )
@@ -55,10 +77,20 @@ export default class UpdateEntryScreen extends Component {
     renderCameraOn() {
         return (
             <Camera
-                ref="Camera"
+                ref={ cam => {
+                    this.camera = cam
+                }}
                 style={styles.cameraPreview}
                 aspect="fill"
                 defaultTouchToFocus>
+                    <Text style={styles.debug}>{this.state.debug}</Text>
+                    <TouchableOpacity
+                      style={styles.captureBtn}
+                      onPress={this.capture.bind(this)}>
+                        <Image
+                            source={require('../img/ic_camera_white_48dp.png')}
+                        />
+                    </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.closeBtn}
                       onPress={this.toggleCamera.bind(this)}>
@@ -146,8 +178,18 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
         flexDirection: 'row',
-        //alignItems: 'center',
         justifyContent: 'flex-end'
+    },
+    debug: {
+        flex: 1,
+        fontSize: 14,
+        color: 'yellow',
+        alignItems: 'center',
+        zIndex: 10
+    },
+    captureBtn: {
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     closeBtn: {
         backgroundColor: "#888",
