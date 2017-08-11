@@ -24,7 +24,7 @@ export default class UpdateEntryScreen extends Component {
 
         this.state = {
             editingText: false,
-            text: "",
+            text: this.props.navigation.state.params.doc.body || "",
             cameraActive: false,
             imageAttachment: null,
             debug: ""
