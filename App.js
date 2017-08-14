@@ -16,7 +16,7 @@ import UpdateEntryScreen from './appComponents/UpdateEntryScreen';
 import PouchDB from 'pouchdb-react-native';
 
 const localDB = new PouchDB('localEntries');
-const remoteDB = new PouchDB('http://192.168.0.174:5984/remember');
+const remoteDB = new PouchDB('http://192.168.0.114:5984/remember');
 
 class Homescreen extends Component {
 
