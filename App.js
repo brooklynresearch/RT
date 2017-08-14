@@ -62,7 +62,7 @@ class Homescreen extends Component {
 
     updateList() {
 
-         localDB.allDocs({include_docs: true, descending: true})
+         localDB.allDocs({include_docs: true, attachments: true, descending: true})
           .then(results => {
             //this.setState({debug: '[+] Local db items: ' + items});
             this.setState({
@@ -70,6 +70,7 @@ class Homescreen extends Component {
             });
           }).catch(err => {
               this.setState({debug: '[!] Error in local database: ' + err})
+              throw err
           });
     }
 
@@ -86,11 +87,17 @@ class Homescreen extends Component {
            });
     }
 
-    updateItem(doc, newText) {
+    updateItem(doc, newText, blob) {
         localDB.put({
             _id: doc._id,
             _rev: doc._rev,
-            body: newText
+            body: newText,
+            _attachments: {
+                'image': {
+                    content_type: 'image/png',
+                    data: blob
+                }
+            }
         }).then( response => {
             this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
         }).catch( err => {

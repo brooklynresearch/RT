@@ -9,6 +9,7 @@ import {
   View
 } from 'react-native';
 import Camera from 'react-native-camera';
+import RNFB from 'react-native-fetch-blob';
 
 const lockOpen = require('../img/ic_lock_open_white_24dp.png')
 const lockClosed = require('../img/ic_lock_white_24dp.png')
@@ -22,18 +23,36 @@ export default class UpdateEntryScreen extends Component {
 
         this.camera = null
 
+        let doc = this.props.navigation.state.params.doc
+
         this.state = {
             editingText: false,
-            text: this.props.navigation.state.params.doc.body || "",
+            text: doc.body || "",
             cameraActive: false,
-            imageAttachment: null,
+            imageAttachment:  doc._attachments ? "data:image/png;base64," + doc._attachments.image.data :  null,
             debug: ""
         }
     }
 
-    save(doc) {
-        this.props.navigation.state.params.updateFn(doc, this.state.text)
+    save(doc, blob) {
+        this.props.navigation.state.params.updateFn(doc, this.state.text, blob)
         this.props.navigation.goBack()
+    }
+
+    readImageBlob(doc) {
+        if (this.state.imageAttachment) {
+
+            RNFB.fs.readFile(this.state.imageAttachment.slice(), 'base64')
+                .then( data => {
+                    this.save(doc, data)
+                })
+                .catch( err => {
+                    this.setState({debug: "File error: " + err.message})
+                    throw err
+                })
+        } else {
+            this.save(doc, null)
+        }
     }
 
     toggleEdit() {
@@ -63,6 +82,8 @@ export default class UpdateEntryScreen extends Component {
     renderCameraOff() {
 
         return (
+            <View>
+            <Text style={styles.debug}>{this.state.debug}</Text>
             <TouchableOpacity onPress={this.toggleCamera.bind(this)}>
                 <Image
                     style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
@@ -71,6 +92,7 @@ export default class UpdateEntryScreen extends Component {
                     }
                 />
             </TouchableOpacity>
+            </View>
        )
     }
 
@@ -116,7 +138,7 @@ export default class UpdateEntryScreen extends Component {
                     />
                     <View style={styles.buttonArea}>
                         <TouchableOpacity style={styles.saveBtn}
-                            onPress={this.save.bind(this, params.doc)}>
+                            onPress={this.readImageBlob.bind(this, params.doc)}>
                             <Image
                                 source={save}
                             />
