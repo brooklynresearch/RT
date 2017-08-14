@@ -29,20 +29,26 @@ export default class UpdateEntryScreen extends Component {
             editingText: false,
             text: doc.body || "",
             cameraActive: false,
-            imageAttachment:  doc._attachments ? "data:image/png;base64," + doc._attachments.image.data :  null,
+            imageAttachment: this.getAttachment(doc),
+            isNewImage: false,
             debug: ""
         }
     }
 
+    getAttachment(doc) {
+        return doc._attachments ? doc._attachments.image.data : null
+    }
+
     save(doc, blob) {
-        this.props.navigation.state.params.updateFn(doc, this.state.text, blob)
+        let img = this.state.isNewImage ? blob : null
+        this.props.navigation.state.params.updateFn(doc, this.state.text, img)
         this.props.navigation.goBack()
     }
 
     readImageBlob(doc) {
-        if (this.state.imageAttachment) {
+        if (this.state.isNewImage) {
 
-            RNFB.fs.readFile(this.state.imageAttachment.slice(), 'base64')
+            RNFB.fs.readFile(this.state.imageAttachment, 'base64')
                 .then( data => {
                     this.save(doc, data)
                 })
@@ -70,7 +76,7 @@ export default class UpdateEntryScreen extends Component {
             this.camera.capture()
             .then( data  => {
                 this.setState({debug: data.path})
-                this.setState({imageAttachment: data.path})
+                this.setState({isNewImage: true, imageAttachment: data.path})
                 this.toggleCamera()
             })
             .catch(err => {
@@ -79,20 +85,27 @@ export default class UpdateEntryScreen extends Component {
        }
     }
 
+    getSource() {
+        let src = this.state.imageAttachment
+        if (!this.state.isNewImage && this.state.imageAttachment) {
+            //We haven't taken a new photo
+            //and there is one already in the database
+            src = "data:image/png;base64," + this.state.imageAttachment
+        }
+        return src
+    }
+
     renderCameraOff() {
 
         return (
-            <View>
-            <Text style={styles.debug}>{this.state.debug}</Text>
             <TouchableOpacity onPress={this.toggleCamera.bind(this)}>
                 <Image
                     style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
                     source={
-                        this.state.imageAttachment ? {uri: this.state.imageAttachment} : blank
+                        this.state.imageAttachment ? {uri: this.getSource()} : blank
                     }
                 />
             </TouchableOpacity>
-            </View>
        )
     }
 
@@ -105,7 +118,6 @@ export default class UpdateEntryScreen extends Component {
                 style={styles.cameraPreview}
                 aspect="fill"
                 defaultTouchToFocus>
-                    <Text style={styles.debug}>{this.state.debug}</Text>
                     <TouchableOpacity
                       style={styles.captureBtn}
                       onPress={this.capture.bind(this)}>

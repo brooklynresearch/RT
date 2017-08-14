@@ -88,17 +88,22 @@ class Homescreen extends Component {
     }
 
     updateItem(doc, newText, blob) {
-        localDB.put({
+        let entry = {
             _id: doc._id,
             _rev: doc._rev,
             body: newText,
-            _attachments: {
+        }
+
+        if (blob !== null) {
+            entry._attachments = {
                 'image': {
-                    content_type: 'image/png',
+                    content_type: "image/png",
                     data: blob
                 }
             }
-        }).then( response => {
+        }
+
+        localDB.put(entry).then( response => {
             this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
         }).catch( err => {
             this.setState({debug: '[!] Error updating item: ' + err})
