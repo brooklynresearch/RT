@@ -88,10 +88,19 @@ class Homescreen extends Component {
     }
 
     updateItem(doc, newText, blob) {
-        let entry = {
-            _id: doc._id,
-            _rev: doc._rev,
-            body: newText,
+        let entry = {}
+
+        if (doc == null) { //It's new
+            entry = {
+                _id: Date.now().toString(),
+                body: newText
+            }
+        } else {
+            entry = {
+                _id: doc._id,
+                _rev: doc._rev,
+                body: newText,
+            }
         }
 
         if (blob !== null) {
@@ -147,7 +156,7 @@ class Homescreen extends Component {
               />
 
               <NewEntryInput
-                  onComplete={this.addItem.bind(this)}
+                  onSelect={this.selectItem.bind(this, null)}
               />
           </View>
         )

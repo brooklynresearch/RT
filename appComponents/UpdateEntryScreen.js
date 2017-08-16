@@ -27,7 +27,7 @@ export default class UpdateEntryScreen extends Component {
 
         this.state = {
             editingText: false,
-            text: doc.body || "",
+            text: doc ? doc.body : "",
             cameraActive: false,
             imageAttachment: this.getAttachment(doc),
             isNewImage: false,
@@ -36,7 +36,10 @@ export default class UpdateEntryScreen extends Component {
     }
 
     getAttachment(doc) {
-        return doc._attachments ? doc._attachments.image.data : null
+        if (doc) {
+            return doc._attachments ? doc._attachments.image.data : null
+        }
+        return null
     }
 
     save(doc, blob) {
@@ -144,7 +147,7 @@ export default class UpdateEntryScreen extends Component {
                 <View style={styles.textArea}>
                     <TextInput style={styles.docText}
                         ref="TextEdit"
-                        defaultValue={params.doc.body}
+                        defaultValue={this.state.text}
                         editable={this.state.editingText}
                         onChangeText={(text) => this.setState({text})}
                     />
