@@ -74,19 +74,6 @@ class Homescreen extends Component {
           });
     }
 
-    addItem(text) {
-
-        let t = Date.now().toString()
-        let b = text
-        localDB.put({_id: t, body: b})
-           .then( (response) => {
-              this.setState({debug: '[+] OK -- added to local db: ' + response.id})
-           })
-           .catch( err => {
-               this.setState({debug: '[!] Error inserting item: ' + err})
-           });
-    }
-
     updateItem(doc, newText, blob) {
         let entry = {}
 
