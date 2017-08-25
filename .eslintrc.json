@@ -1,6 +1,6 @@
 {
     "env": {
-        "browser": false,
+        "amd": true,
         "es6": true
     },
     "extends": ["eslint:recommended", "plugin:react/recommended"],
@@ -16,25 +16,29 @@
         "react-native"
     ],
     "rules": {
+        "eqeqeq": [
+            "error",
+            "always"
+        ],
         "indent": [
             "error",
             2
         ],
-        "linebreak-style": [
-            "error",
-            "unix"
+        "brace-style": [
+            "warn",
+            "1tbs",
+            {"allowSingleLine": true}
         ],
         "semi": [
             "error",
             "never"
         ],
         "no-unused-vars": [
-            "warn",
-            {"vars": "all"}
+            "error",
+            {"vars": "all", "args": "none"}
         ],
         "react/prop-types": [
-            0,
-            {}
+            0
         ]
     }
 }

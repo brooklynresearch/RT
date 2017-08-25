@@ -93,7 +93,7 @@ class Homescreen extends Component {
 
     let entry = {}
 
-    if (doc == null) { //It's new
+    if (doc === null) { //It's new
       entry = {
         _id: Date.now().toString(),
         body: newText

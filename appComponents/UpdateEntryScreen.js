@@ -1,4 +1,3 @@
-/*global require*/ //this is just for eslint
 import React, { Component } from 'react'
 
 import {
@@ -23,6 +22,7 @@ export default class UpdateEntryScreen extends Component {
     super(props)
 
     this.camera = null
+    this.textInput = null
 
     let doc = this.props.navigation.state.params.doc
 
@@ -57,7 +57,6 @@ export default class UpdateEntryScreen extends Component {
   readImageBlob(doc) {
 
     if (this.state.isNewImage) {
-
       RNFB.fs.readFile(this.state.imageAttachment, 'base64')
         .then( data => {
           this.save(doc, data)
@@ -75,7 +74,7 @@ export default class UpdateEntryScreen extends Component {
   toggleEdit() {
 
     this.setState({editingText: !this.state.editingText})
-    this.refs.TextEdit.focus()
+    this.textInput.focus()
 
   }
 
@@ -167,7 +166,9 @@ export default class UpdateEntryScreen extends Component {
 
         <View style={styles.textArea}>
           <TextInput style={styles.docText}
-            ref="TextEdit"
+            ref={ ref => {
+              this.textInput = ref
+            }}
             defaultValue={this.state.text}
             editable={this.state.editingText}
             onChangeText={(text) => this.setState({text})}
