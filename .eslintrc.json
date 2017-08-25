@@ -1,0 +1,44 @@
+{
+    "env": {
+        "amd": true,
+        "es6": true
+    },
+    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "experimentalObjectRestSpread": true,
+            "jsx": true
+        },
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "react-native"
+    ],
+    "rules": {
+        "eqeqeq": [
+            "error",
+            "always"
+        ],
+        "indent": [
+            "error",
+            2
+        ],
+        "brace-style": [
+            "warn",
+            "1tbs",
+            {"allowSingleLine": true}
+        ],
+        "semi": [
+            "error",
+            "never"
+        ],
+        "no-unused-vars": [
+            "error",
+            {"vars": "all", "args": "none"}
+        ],
+        "react/prop-types": [
+            0
+        ]
+    }
+}
