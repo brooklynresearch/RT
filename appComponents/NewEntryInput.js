@@ -54,10 +54,8 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    top: 10,
     borderColor: "blue",
     borderWidth: 2,
-    bottom: "10%",
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: "blue"
