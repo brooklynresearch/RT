@@ -1,40 +1,48 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View
-} from 'react-native';
+} from 'react-native'
 
 export default class NewEntryInput extends Component {
-    constructor(props) {
-        super(props)
 
-        this.state = {
-            text: ""
-        }
+  constructor(props) {
+
+    super(props)
+
+    this.state = {
+      text: ""
     }
 
-    _addItem() {
-        this.props.onSelect(this.state.text)
-        this.setState({text: ""})
-    }
+  }
 
-    render() {
-        return (
-          <View style={styles.container}>
+  _addItem() {
 
-            <TouchableOpacity onPress={this._addItem.bind(this)}>
-                <View style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Remember This
-                    </Text>
-                </View>
-            </TouchableOpacity>
+    this.props.onSelect(this.state.text)
+    this.setState({text: ""})
+
+  }
+
+  render() {
+
+    return (
+      <View style={styles.container}>
+
+        <TouchableOpacity onPress={this._addItem.bind(this)}>
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>
+              Remember This
+            </Text>
           </View>
-       )
-    }
+        </TouchableOpacity>
+
+      </View>
+    )
+
+  }
 }
 
 const styles = StyleSheet.create({
