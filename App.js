@@ -160,7 +160,7 @@ class Homescreen extends Component {
         />
 
         <NewEntryInput
-          onComplete={this.selectItem.bind(this, null)}
+          onSelect={this.selectItem.bind(this, null)}
         />
 
       </View>
