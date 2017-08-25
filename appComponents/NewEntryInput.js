@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 import {
   StyleSheet,
@@ -6,43 +6,50 @@ import {
   TextInput,
   TouchableOpacity,
   View
-} from 'react-native';
+} from 'react-native'
 
 export default class NewEntryInput extends Component {
-    constructor(props) {
-        super(props)
 
-        this.state = {
-            text: ""
-        }
+  constructor(props) {
+
+    super(props)
+
+    this.state = {
+      text: ""
     }
 
-    _addItem() {
-        this.props.onComplete(this.state.text)
-        this.setState({text: ""})
-    }
+  }
 
-    render() {
-        return (
-          <View style={styles.container}>
-            <View style={styles.textEntryContainer}>
-                <TextInput
-                    style={styles.rememberText}
-                    value={this.state.text}
-                    onChangeText={(text) => this.setState({text})}
-                />
-            </View>
+  _addItem() {
 
-            <TouchableOpacity onPress={this._addItem.bind(this)}>
-                <View style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Remember This
-                    </Text>
-                </View>
-            </TouchableOpacity>
+    this.props.onComplete(this.state.text)
+    this.setState({text: ""})
+
+  }
+
+  render() {
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.textEntryContainer}>
+          <TextInput
+            style={styles.rememberText}
+            value={this.state.text}
+            onChangeText={(text) => this.setState({text})}
+          />
+        </View>
+
+        <TouchableOpacity onPress={this._addItem.bind(this)}>
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>
+              Remember This
+            </Text>
           </View>
-       )
-    }
+        </TouchableOpacity>
+      </View>
+    )
+
+  }
 }
 
 const styles = StyleSheet.create({

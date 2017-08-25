@@ -1,157 +1,162 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 import {
   AppRegistry,
   StyleSheet,
   Text,
   View
-} from 'react-native';
+} from 'react-native'
 
-import { StackNavigator } from 'react-navigation';
+import { StackNavigator } from 'react-navigation'
 
-import RememberList from './appComponents/RememberList';
-import NewEntryInput from './appComponents/NewEntryInput';
-import UpdateEntryScreen from './appComponents/UpdateEntryScreen';
+import RememberList from './appComponents/RememberList'
+import NewEntryInput from './appComponents/NewEntryInput'
+import UpdateEntryScreen from './appComponents/UpdateEntryScreen'
 
-import PouchDB from 'pouchdb-react-native';
+import PouchDB from 'pouchdb-react-native'
 
-const localDB = new PouchDB('localEntries');
-const remoteDB = new PouchDB('http://192.168.0.114:5984/remember');
+const localDB = new PouchDB('localEntries')
+const remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
 
 class Homescreen extends Component {
 
-    static navigationOptions = {
-          header: null
+  static navigationOptions() {
+    return {header: null}
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      text: "",
+      docs: [],
+      debug: ""
     }
 
-    constructor(props) {
-        super(props)
+    localDB.changes({
+      since: 'now',
+      live: true,
+      include_docs: true
+    }).on('change', () => {
+      this.updateList()
+      //this.setState({debug: "Local Database Change"})
+    }).on('complete', (info) => {
+      //disconnect
+    }).on('error', (err) => {
+      this.setState({debug: '[!] Error updating local database: ' + err})
+    })
 
-        this.state = {
-            text: "",
-            docs: [],
-            debug: ""
-        }
+    localDB.sync(remoteDB, {
+      live: true,
+      retry: true
+    }).on('change', (info) => {
+      this.setState({debug: "[+] Remote database change: " + info.change.start_time})
+    }).on('error', (err) => {
+      this.setState({debug: "[!] Remote database error: " + err})
+    })
 
-        localDB.changes({
-            since: 'now',
-            live: true,
-            include_docs: true
-        }).on('change', () => {
-            this.updateList()
-            //this.setState({debug: "Local Database Change"})
-          })
-          .on('complete', (info) => {
-              //disconnect
-          })
-          .on('error', (err) => {
-              this.setState({debug: '[!] Error updating local database: ' + err})
-          });
+    this.updateList()
+  }
 
-       localDB.sync(remoteDB, {
-         live: true,
-         retry: true
-       }).on('change', (info) => {
-           this.setState({debug: "[+] Remote database change: " + info.change.start_time})
-       }).on('error', (err) => {
-           this.setState({debug: "[!] Remote database error: " + err})
-       });
+  updateList() {
 
-      this.updateList();
-    }
-
-    updateList() {
-
-         localDB.allDocs({include_docs: true, attachments: true, descending: true})
-          .then(results => {
-            //this.setState({debug: '[+] Local db items: ' + items});
-            this.setState({
-                docs: results.rows.map(row => row.doc)
-            });
-          }).catch(err => {
-              this.setState({debug: '[!] Error in local database: ' + err})
-              throw err
-          });
-    }
-
-    addItem(text) {
-
-        let t = Date.now().toString()
-        let b = text
-        localDB.put({_id: t, body: b})
-           .then( (response) => {
-              this.setState({debug: '[+] OK -- added to local db: ' + response.id})
-           })
-           .catch( err => {
-               this.setState({debug: '[!] Error inserting item: ' + err})
-           });
-    }
-
-    updateItem(doc, newText, blob) {
-        let entry = {
-            _id: doc._id,
-            _rev: doc._rev,
-            body: newText,
-        }
-
-        if (blob !== null) {
-            entry._attachments = {
-                'image': {
-                    content_type: "image/png",
-                    data: blob
-                }
-            }
-        }
-
-        localDB.put(entry).then( response => {
-            this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
-        }).catch( err => {
-            this.setState({debug: '[!] Error updating item: ' + err})
+    localDB.allDocs({include_docs: true, attachments: true, descending: true})
+      .then(results => {
+        //this.setState({debug: '[+] Local db items: ' + items});
+        this.setState({
+          docs: results.rows.map(row => row.doc)
         })
+      })
+      .catch(err => {
+        this.setState({debug: '[!] Error in local database: ' + err})
+        throw err
+      })
+  }
+
+  addItem(text) {
+
+    let t = Date.now().toString()
+    let b = text
+    localDB.put({_id: t, body: b})
+      .then( (response) => {
+        this.setState({debug: '[+] OK -- added to local db: ' + response.id})
+      })
+      .catch( err => {
+        this.setState({debug: '[!] Error inserting item: ' + err})
+      })
+  }
+
+  updateItem(doc, newText, blob) {
+
+    let entry = {
+      _id: doc._id,
+      _rev: doc._rev,
+      body: newText,
     }
 
-    deleteItem(row) {
-
-        localDB.remove(row)
-            .then( response => {
-                if (response.ok === true) {
-                    this.setState({debug: "[+] OK -- Deleted: " + row._id})
-                }
-            })
-            .catch( err => {
-                this.setState({debug: "[!] Error deleting item: " + err})
-            });
+    if (blob !== null) {
+      entry._attachments = {
+        'image': {
+          content_type: "image/png",
+          data: blob
+        }
+      }
     }
 
-    selectItem(row) {
-        let {navigate} = this.props.navigation
-        navigate('Update', {
-            doc: row,
-            updateFn: this.updateItem.bind(this)
-        })
-    }
+    localDB.put(entry).then( response => {
+      this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
+    }).catch( err => {
+      this.setState({debug: '[!] Error updating item: ' + err})
+    })
 
-    render() {
+  }
 
-        const { navigate } = this.props.navigation
+  deleteItem(row) {
 
-        return (
-          <View style={styles.mainContainer}>
+    localDB.remove(row)
+      .then( response => {
+        if (response.ok === true) {
+          this.setState({debug: "[+] OK -- Deleted: " + row._id})
+        }
+      })
+      .catch( err => {
+        this.setState({debug: "[!] Error deleting item: " + err})
+      })
 
-              <Text style={styles.debug}>{this.state.debug}</Text>
+  }
 
-              <RememberList
-                  docs={this.state.docs}
-                  onSelect={this.selectItem.bind(this)}
-                  onDelete={this.deleteItem.bind(this)}
-              />
+  selectItem(row) {
 
-              <NewEntryInput
-                  onComplete={this.addItem.bind(this)}
-              />
-          </View>
-        )
-    }
+    let {navigate} = this.props.navigation
+    navigate('Update', {
+      doc: row,
+      updateFn: this.updateItem.bind(this)
+    })
+
+  }
+
+  render() {
+
+    return (
+      <View style={styles.mainContainer}>
+
+        <Text style={styles.debug}>{this.state.debug}</Text>
+
+        <RememberList
+          docs={this.state.docs}
+          onSelect={this.selectItem.bind(this)}
+          onDelete={this.deleteItem.bind(this)}
+        />
+
+        <NewEntryInput
+          onComplete={this.addItem.bind(this)}
+        />
+
+      </View>
+    )
+
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -168,9 +173,9 @@ const styles = StyleSheet.create({
 })
 
 const RememberApp = StackNavigator({
-    Home: {screen: Homescreen},
-    Update: {screen: UpdateEntryScreen}
+  Home: {screen: Homescreen},
+  Update: {screen: UpdateEntryScreen}
 })
 
-AppRegistry.registerComponent('rememberThis', () => RememberApp);
+AppRegistry.registerComponent('rememberThis', () => RememberApp)
 
