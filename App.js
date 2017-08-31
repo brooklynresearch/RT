@@ -15,8 +15,8 @@ import UpdateEntryScreen from './appComponents/UpdateEntryScreen'
 
 import PouchDB from 'pouchdb-react-native'
 
-const localDB = new PouchDB('localEntries')
-const remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
+let localDB
+let remoteDB
 
 class Homescreen extends Component {
 
@@ -25,7 +25,6 @@ class Homescreen extends Component {
   }
 
   constructor(props) {
-
     super(props)
 
     this.state = {
@@ -34,7 +33,8 @@ class Homescreen extends Component {
       debug: ""
     }
 
-    localDB.changes({
+    localDB = new PouchDB('localEntries')
+    this.changeHandler = localDB.changes({
       since: 'now',
       live: true,
       include_docs: true
@@ -47,7 +47,8 @@ class Homescreen extends Component {
       this.setState({debug: '[!] Error updating local database: ' + err})
     })
 
-    localDB.sync(remoteDB, {
+    remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
+    this.syncHandler = localDB.sync(remoteDB, {
       live: true,
       retry: true
     }).on('change', (info) => {
@@ -57,7 +58,14 @@ class Homescreen extends Component {
     })
 
     this.updateList()
+  }
 
+  componentWillUnmount() {
+    //cancel listeners to prevent mem leaks
+    this.changeHandler.cancel();
+    this.syncHandler.cancel();
+    localDB.close()
+    remoteDB.close()
   }
 
   updateList() {
