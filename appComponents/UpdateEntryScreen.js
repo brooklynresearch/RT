@@ -142,6 +142,13 @@ export default class UpdateEntryScreen extends Component {
           style={styles.captureBtn}
           onPress={this.capture.bind(this)}>
           <Image
+            source={require('../img/ic_videocam_white_48dp.png')}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.captureBtn}
+          onPress={this.capture.bind(this)}>
+          <Image
             source={require('../img/ic_camera_white_48dp.png')}
           />
         </TouchableOpacity>
@@ -230,7 +237,6 @@ const styles = StyleSheet.create({
   },
   cameraPort: {
     flex: 2,
-    //backgroundColor: "#999",
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -239,7 +245,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     flexDirection: 'row',
-    justifyContent: 'flex-end'
   },
   debug: {
     flex: 1,
@@ -249,10 +254,14 @@ const styles = StyleSheet.create({
     zIndex: 10
   },
   captureBtn: {
+    flex: 5,
+    width: "100%",
+    bottom: "10%",
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'flex-end'
   },
   closeBtn: {
+    flex: 1,
     backgroundColor: "#888",
     height: "10%",
     alignItems: 'center',
