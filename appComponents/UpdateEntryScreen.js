@@ -30,6 +30,7 @@ export default class UpdateEntryScreen extends Component {
       editingText: false,
       text: doc ? doc.body : "",
       cameraActive: false,
+      cameraRecording: false,
       imageAttachment: this.getAttachment(doc),
       isNewImage: false,
       debug: ""
@@ -100,6 +101,26 @@ export default class UpdateEntryScreen extends Component {
 
   }
 
+  toggleRecord() {
+    if (this.camera) {
+      if (!this.state.cameraRecording) {
+        this.setState({cameraRecording: true})
+        this.camera.capture({mode: Camera.constants.CaptureMode.video})
+          .then( data => {
+            this.setState({debug: data.path})
+            this.setState({isNewImage: true, imageAttachment: data.path})
+          })
+          .catch(err => {
+            this.setState({debug: err})
+          })
+      } else {
+        this.setState({cameraRecording: false})
+        this.camera.stopCapture()
+        this.toggleCamera()
+      }
+    }
+  }
+
   getSource() {
 
     let src = this.state.imageAttachment
@@ -140,7 +161,7 @@ export default class UpdateEntryScreen extends Component {
 
         <TouchableOpacity
           style={styles.captureBtn}
-          onPress={this.capture.bind(this)}>
+          onPress={this.toggleRecord.bind(this)}>
           <Image
             source={require('../img/ic_videocam_white_48dp.png')}
           />
