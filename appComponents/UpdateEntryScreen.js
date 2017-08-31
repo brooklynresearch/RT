@@ -14,6 +14,8 @@ const lockOpen = require('../img/ic_lock_open_white_24dp.png')
 const lockClosed = require('../img/ic_lock_white_24dp.png')
 const save = require('../img/ic_save_white_36dp.png')
 const blank = require('../img/ic_add_a_photo_white_48dp.png')
+const videoOn = require('../img/ic_videocam_white_48dp.png')
+const videoOff = require('../img/ic_videocam_off_white_48dp.png')
 
 export default class UpdateEntryScreen extends Component {
 
@@ -163,7 +165,7 @@ export default class UpdateEntryScreen extends Component {
           style={styles.captureBtn}
           onPress={this.toggleRecord.bind(this)}>
           <Image
-            source={require('../img/ic_videocam_white_48dp.png')}
+            source={this.state.cameraRecording ? videoOff : videoOn}
           />
         </TouchableOpacity>
         <TouchableOpacity
