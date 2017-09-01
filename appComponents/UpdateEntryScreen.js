@@ -34,6 +34,7 @@ export default class UpdateEntryScreen extends Component {
       cameraActive: false,
       cameraRecording: false,
       imageAttachment: this.getAttachment(doc),
+      attachmentType: this.getAttachmentType(doc),
       isNewImage: false,
       debug: ""
     }
@@ -41,18 +42,24 @@ export default class UpdateEntryScreen extends Component {
   }
 
   getAttachment(doc) {
-
     if (doc) {
       return doc._attachments ? doc._attachments.image.data : null
     }
     return null
+  }
 
+  getAttachmentType(doc) {
+    if (doc && doc._attachments) {
+      return doc._attachments.image.content_type
+    }
+    return null
   }
 
   save(doc, blob) {
 
     let img = this.state.isNewImage ? blob : null
-    this.props.navigation.state.params.updateFn(doc, this.state.text, img)
+    let type = this.state.attachmentType
+    this.props.navigation.state.params.updateFn(doc, this.state.text, img, type)
     this.props.navigation.goBack()
 
   }
@@ -93,14 +100,16 @@ export default class UpdateEntryScreen extends Component {
       this.camera.capture()
         .then( data  => {
           this.setState({debug: data.path})
-          this.setState({isNewImage: true, imageAttachment: data.path})
+          this.setState({
+            isNewImage: true,
+            attachmentType: "image/png",
+            imageAttachment: data.path})
           this.toggleCamera()
         })
         .catch(err => {
           this.setState({debug: err})
         })
     }
-
   }
 
   toggleRecord() {
@@ -110,7 +119,12 @@ export default class UpdateEntryScreen extends Component {
         this.camera.capture({mode: Camera.constants.CaptureMode.video})
           .then( data => {
             this.setState({debug: data.path})
-            this.setState({isNewImage: true, imageAttachment: data.path})
+            this.setState({
+              isNewImage: true,
+              imageAttachment: data.path,
+              attachmentType: "video/mp4"
+            })
+            this.toggleCamera()
           })
           .catch(err => {
             this.setState({debug: err})
@@ -118,9 +132,30 @@ export default class UpdateEntryScreen extends Component {
       } else {
         this.setState({cameraRecording: false})
         this.camera.stopCapture()
-        this.toggleCamera()
       }
     }
+  }
+
+  renderImageAttachment() {
+    return (
+      <Image
+        style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
+        source={
+          this.state.imageAttachment ? {uri: this.getSource()} : blank
+        }
+      />
+    )
+  }
+
+  renderVideoAttachment() {
+
+  }
+
+  displayAttachment() {
+    if (this.state.attachmentType === "video/mp4") {
+      return this.renderVideoAttachment()
+    }
+    return this.renderImageAttachment()
   }
 
   getSource() {
@@ -129,25 +164,19 @@ export default class UpdateEntryScreen extends Component {
     if (!this.state.isNewImage && this.state.imageAttachment) {
       //We haven't taken a new photo
       //and there is one already in the database
-      src = "data:image/png;base64," + this.state.imageAttachment
+      let type = this.state.attachmentType
+      src = "data:"+type+";base64," + this.state.imageAttachment
     }
     return src
-
   }
 
   renderCameraOff() {
 
     return (
       <TouchableOpacity onPress={this.toggleCamera.bind(this)}>
-        <Image
-          style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
-          source={
-            this.state.imageAttachment ? {uri: this.getSource()} : blank
-          }
-        />
+        {this.displayAttachment()}
       </TouchableOpacity>
     )
-
   }
 
   renderCameraOn() {

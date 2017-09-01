@@ -84,7 +84,7 @@ class Homescreen extends Component {
 
   }
 
-  updateItem(doc, newText, blob) {
+  updateItem(doc, newText, blob, type) {
 
     let entry = {}
 
@@ -103,7 +103,7 @@ class Homescreen extends Component {
     if (blob !== null) {
       entry._attachments = {
         'image': {
-          content_type: "image/png",
+          content_type: type,
           data: blob
         }
       }
