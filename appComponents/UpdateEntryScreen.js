@@ -8,6 +8,7 @@ import {
   View
 } from 'react-native'
 import Camera from 'react-native-camera'
+import Video from 'react-native-video'
 import RNFB from 'react-native-fetch-blob'
 
 const lockOpen = require('../img/ic_lock_open_white_24dp.png')
@@ -148,7 +149,24 @@ export default class UpdateEntryScreen extends Component {
   }
 
   renderVideoAttachment() {
-
+    return (
+        <Video
+          source={{uri: this.state.imageAttachment}}
+          ref={(ref) => {
+           this.player = ref
+          }}
+          rate={1.0}
+          volume={1.0}
+          muted={false}
+          paused={false}
+          resizeMode="cover"
+          repeat={true}
+          playInBackground={false}
+          playWhenInactive={false}
+          ignoreSilentSwitch={"ignore"}
+          style={styles.video}
+        />
+    )
   }
 
   displayAttachment() {
@@ -318,6 +336,10 @@ const styles = StyleSheet.create({
     height: "10%",
     alignItems: 'center',
     justifyContent: 'flex-start'
+  },
+  video: {
+    height: 450,
+    width: 450
   }
 })
 
