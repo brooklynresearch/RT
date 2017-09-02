@@ -37,7 +37,8 @@ class Homescreen extends Component {
     this.changeHandler = localDB.changes({
       since: 'now',
       live: true,
-      include_docs: true
+      include_docs: true,
+      attachments: true
     }).on('change', () => {
       this.updateList()
       //this.setState({debug: "Local Database Change"})
@@ -50,7 +51,8 @@ class Homescreen extends Component {
     remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
     this.syncHandler = localDB.sync(remoteDB, {
       live: true,
-      retry: true
+      retry: true,
+      attachments: true
     }).on('change', (info) => {
       this.setState({debug: "[+] Remote database change: " + info.change.start_time})
     }).on('error', (err) => {
@@ -88,6 +90,7 @@ class Homescreen extends Component {
 
     let entry = {}
 
+    this.setState({debug: "Blob type: " + type})
     if (doc === null) { //It's new
       entry = {
         _id: Date.now().toString(),

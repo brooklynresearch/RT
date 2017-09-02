@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import {
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   Image,
@@ -37,7 +38,7 @@ export default class UpdateEntryScreen extends Component {
       imageAttachment: this.getAttachment(doc),
       attachmentType: this.getAttachmentType(doc),
       isNewImage: false,
-      debug: ""
+      debug: "DEBUGGING"
     }
 
   }
@@ -100,9 +101,9 @@ export default class UpdateEntryScreen extends Component {
     if (this.camera) {
       this.camera.capture()
         .then( data  => {
-          this.setState({debug: data.path})
           this.setState({
             isNewImage: true,
+            debug: data.path,
             attachmentType: "image/png",
             imageAttachment: data.path})
           this.toggleCamera()
@@ -119,9 +120,9 @@ export default class UpdateEntryScreen extends Component {
         this.setState({cameraRecording: true})
         this.camera.capture({mode: Camera.constants.CaptureMode.video})
           .then( data => {
-            this.setState({debug: data.path})
             this.setState({
               isNewImage: true,
+              debug: data.path,
               imageAttachment: data.path,
               attachmentType: "video/mp4"
             })
@@ -151,7 +152,7 @@ export default class UpdateEntryScreen extends Component {
   renderVideoAttachment() {
     return (
         <Video
-          source={{uri: this.state.imageAttachment}}
+          source={{uri: this.getSource()}}
           ref={(ref) => {
            this.player = ref
           }}
@@ -241,6 +242,7 @@ export default class UpdateEntryScreen extends Component {
     return (
       <View style={styles.container}>
 
+        <Text style={styles.debug}>{this.state.attachmentType}</Text>
         <View style={styles.textArea}>
           <TextInput style={styles.docText}
             ref={ ref => {
@@ -317,11 +319,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   debug: {
-    flex: 1,
-    fontSize: 14,
-    color: 'yellow',
+    fontSize: 24,
+    width: "100%",
+    color: '#00ff00',
     alignItems: 'center',
-    zIndex: 10
   },
   captureBtn: {
     flex: 5,
@@ -338,6 +339,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start'
   },
   video: {
+    flex: 1,
     height: 450,
     width: 450
   }
