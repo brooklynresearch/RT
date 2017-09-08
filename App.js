@@ -15,8 +15,8 @@ import UpdateEntryScreen from './appComponents/UpdateEntryScreen'
 
 import PouchDB from 'pouchdb-react-native'
 
-const localDB = new PouchDB('localEntries')
-const remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
+let localDB
+let remoteDB
 
 class Homescreen extends Component {
 
@@ -25,7 +25,6 @@ class Homescreen extends Component {
   }
 
   constructor(props) {
-
     super(props)
 
     this.state = {
@@ -34,10 +33,12 @@ class Homescreen extends Component {
       debug: ""
     }
 
-    localDB.changes({
+    localDB = new PouchDB('localEntries')
+    this.changeHandler = localDB.changes({
       since: 'now',
       live: true,
-      include_docs: true
+      include_docs: true,
+      attachments: true
     }).on('change', () => {
       this.updateList()
       //this.setState({debug: "Local Database Change"})
@@ -47,9 +48,11 @@ class Homescreen extends Component {
       this.setState({debug: '[!] Error updating local database: ' + err})
     })
 
-    localDB.sync(remoteDB, {
+    remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
+    this.syncHandler = localDB.sync(remoteDB, {
       live: true,
-      retry: true
+      retry: true,
+      attachments: true
     }).on('change', (info) => {
       this.setState({debug: "[+] Remote database change: " + info.change.start_time})
     }).on('error', (err) => {
@@ -57,7 +60,14 @@ class Homescreen extends Component {
     })
 
     this.updateList()
+  }
 
+  componentWillUnmount() {
+    //cancel listeners to prevent mem leaks
+    this.changeHandler.cancel();
+    this.syncHandler.cancel();
+    localDB.close()
+    remoteDB.close()
   }
 
   updateList() {
@@ -76,10 +86,11 @@ class Homescreen extends Component {
 
   }
 
-  updateItem(doc, newText, blob) {
+  updateItem(doc, newText, blob, type) {
 
     let entry = {}
 
+    this.setState({debug: "Blob type: " + type})
     if (doc === null) { //It's new
       entry = {
         _id: Date.now().toString(),
@@ -95,7 +106,7 @@ class Homescreen extends Component {
     if (blob !== null) {
       entry._attachments = {
         'image': {
-          content_type: "image/png",
+          content_type: type,
           data: blob
         }
       }

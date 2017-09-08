@@ -2,18 +2,22 @@ import React, { Component } from 'react'
 
 import {
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   Image,
   View
 } from 'react-native'
 import Camera from 'react-native-camera'
+import Video from 'react-native-video'
 import RNFB from 'react-native-fetch-blob'
 
 const lockOpen = require('../img/ic_lock_open_white_24dp.png')
 const lockClosed = require('../img/ic_lock_white_24dp.png')
 const save = require('../img/ic_save_white_36dp.png')
 const blank = require('../img/ic_add_a_photo_white_48dp.png')
+const videoOn = require('../img/ic_videocam_white_48dp.png')
+const videoOff = require('../img/ic_videocam_off_white_48dp.png')
 
 export default class UpdateEntryScreen extends Component {
 
@@ -30,26 +34,34 @@ export default class UpdateEntryScreen extends Component {
       editingText: false,
       text: doc ? doc.body : "",
       cameraActive: false,
+      cameraRecording: false,
       imageAttachment: this.getAttachment(doc),
+      attachmentType: this.getAttachmentType(doc),
       isNewImage: false,
-      debug: ""
+      debug: "DEBUGGING"
     }
 
   }
 
   getAttachment(doc) {
-
     if (doc) {
       return doc._attachments ? doc._attachments.image.data : null
     }
     return null
+  }
 
+  getAttachmentType(doc) {
+    if (doc && doc._attachments) {
+      return doc._attachments.image.content_type
+    }
+    return null
   }
 
   save(doc, blob) {
 
     let img = this.state.isNewImage ? blob : null
-    this.props.navigation.state.params.updateFn(doc, this.state.text, img)
+    let type = this.state.attachmentType
+    this.props.navigation.state.params.updateFn(doc, this.state.text, img, type)
     this.props.navigation.goBack()
 
   }
@@ -89,15 +101,80 @@ export default class UpdateEntryScreen extends Component {
     if (this.camera) {
       this.camera.capture()
         .then( data  => {
-          this.setState({debug: data.path})
-          this.setState({isNewImage: true, imageAttachment: data.path})
+          this.setState({
+            isNewImage: true,
+            debug: data.path,
+            attachmentType: "image/png",
+            imageAttachment: data.path})
           this.toggleCamera()
         })
         .catch(err => {
           this.setState({debug: err})
         })
     }
+  }
 
+  toggleRecord() {
+    if (this.camera) {
+      if (!this.state.cameraRecording) {
+        this.setState({cameraRecording: true})
+        this.camera.capture({mode: Camera.constants.CaptureMode.video})
+          .then( data => {
+            this.setState({
+              isNewImage: true,
+              debug: data.path,
+              imageAttachment: data.path,
+              attachmentType: "video/mp4"
+            })
+            this.toggleCamera()
+          })
+          .catch(err => {
+            this.setState({debug: err})
+          })
+      } else {
+        this.setState({cameraRecording: false})
+        this.camera.stopCapture()
+      }
+    }
+  }
+
+  renderImageAttachment() {
+    return (
+      <Image
+        style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
+        source={
+          this.state.imageAttachment ? {uri: this.getSource()} : blank
+        }
+      />
+    )
+  }
+
+  renderVideoAttachment() {
+    return (
+        <Video
+          source={{uri: this.getSource()}}
+          ref={(ref) => {
+           this.player = ref
+          }}
+          rate={1.0}
+          volume={1.0}
+          muted={false}
+          paused={false}
+          resizeMode="cover"
+          repeat={true}
+          playInBackground={false}
+          playWhenInactive={false}
+          ignoreSilentSwitch={"ignore"}
+          style={styles.video}
+        />
+    )
+  }
+
+  displayAttachment() {
+    if (this.state.attachmentType === "video/mp4") {
+      return this.renderVideoAttachment()
+    }
+    return this.renderImageAttachment()
   }
 
   getSource() {
@@ -106,25 +183,19 @@ export default class UpdateEntryScreen extends Component {
     if (!this.state.isNewImage && this.state.imageAttachment) {
       //We haven't taken a new photo
       //and there is one already in the database
-      src = "data:image/png;base64," + this.state.imageAttachment
+      let type = this.state.attachmentType
+      src = "data:"+type+";base64," + this.state.imageAttachment
     }
     return src
-
   }
 
   renderCameraOff() {
 
     return (
       <TouchableOpacity onPress={this.toggleCamera.bind(this)}>
-        <Image
-          style={this.state.imageAttachment ? {height: 450, width: 450} : {flex: 0}}
-          source={
-            this.state.imageAttachment ? {uri: this.getSource()} : blank
-          }
-        />
+        {this.displayAttachment()}
       </TouchableOpacity>
     )
-
   }
 
   renderCameraOn() {
@@ -138,6 +209,13 @@ export default class UpdateEntryScreen extends Component {
         aspect="fill"
         defaultTouchToFocus>
 
+        <TouchableOpacity
+          style={styles.captureBtn}
+          onPress={this.toggleRecord.bind(this)}>
+          <Image
+            source={this.state.cameraRecording ? videoOff : videoOn}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.captureBtn}
           onPress={this.capture.bind(this)}>
@@ -164,6 +242,7 @@ export default class UpdateEntryScreen extends Component {
     return (
       <View style={styles.container}>
 
+        <Text style={styles.debug}>{this.state.attachmentType}</Text>
         <View style={styles.textArea}>
           <TextInput style={styles.docText}
             ref={ ref => {
@@ -230,7 +309,6 @@ const styles = StyleSheet.create({
   },
   cameraPort: {
     flex: 2,
-    //backgroundColor: "#999",
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -239,24 +317,31 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     flexDirection: 'row',
-    justifyContent: 'flex-end'
   },
   debug: {
-    flex: 1,
-    fontSize: 14,
-    color: 'yellow',
+    fontSize: 24,
+    width: "100%",
+    color: '#00ff00',
     alignItems: 'center',
-    zIndex: 10
   },
   captureBtn: {
+    flex: 5,
+    width: "100%",
+    bottom: "10%",
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'flex-end'
   },
   closeBtn: {
+    flex: 1,
     backgroundColor: "#888",
     height: "10%",
     alignItems: 'center',
     justifyContent: 'flex-start'
+  },
+  video: {
+    flex: 1,
+    height: 450,
+    width: 450
   }
 })
 
