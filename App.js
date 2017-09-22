@@ -11,7 +11,7 @@ import { StackNavigator } from 'react-navigation'
 
 //Our modules
 import RememberList from './appComponents/RememberList'
-import NewEntryInput from './appComponents/NewEntryInput'
+import NewEntryButton from './appComponents/NewEntryButton'
 import UpdateEntryScreen from './appComponents/UpdateEntryScreen'
 import Database from './appComponents/Database'
 
@@ -106,7 +106,7 @@ class Homescreen extends Component {
           onDelete={this.deleteItem.bind(this)}
         />
 
-        <NewEntryInput
+        <NewEntryButton
           onSelect={this.selectItem.bind(this, null)}
         />
 

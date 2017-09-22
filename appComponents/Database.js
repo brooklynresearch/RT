@@ -11,20 +11,22 @@ export default class Database {
 
   //Connect to local database on device
   //Calls updateFn on db change event
-  //and errorFn on db error event
-  connect(dbName, updateFn, errorFn) {
-    this.localDB = new PouchDB('localEntries')
-    this.changeHandler = this.localDB.changes({
-      since: 'now',
-      live: true,
-      include_docs: true,
-      attachments: true
-    }).on('change', () => {
-      updateFn()
-    }).on('complete', (info) => {
-      //has disconnected
-    }).on('error', (err) => {
-      errorFn(err)
+  connect(updateFn) {
+    return new Promise((resolve, reject) => {
+      this.localDB = new PouchDB('localEntries')
+      this.changeHandler = this.localDB.changes({
+        since: 'now',
+        live: true,
+        include_docs: true,
+        attachments: true
+      }).on('change', () => {
+        updateFn()
+      }).on('complete', (info) => {
+        //has disconnected
+      }).on('error', (err) => {
+        reject(err)
+      })
+      resolve()
     })
   }
 
