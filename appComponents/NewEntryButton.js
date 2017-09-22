@@ -7,7 +7,7 @@ import {
   View
 } from 'react-native'
 
-export default class NewEntryInput extends Component {
+export default class NewEntryButton extends Component {
 
   constructor(props) {
 

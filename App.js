@@ -9,14 +9,13 @@ import {
 
 import { StackNavigator } from 'react-navigation'
 
+//Our modules
 import RememberList from './appComponents/RememberList'
-import NewEntryInput from './appComponents/NewEntryInput'
+import NewEntryButton from './appComponents/NewEntryButton'
 import UpdateEntryScreen from './appComponents/UpdateEntryScreen'
+import Database from './appComponents/Database'
 
-import PouchDB from 'pouchdb-react-native'
-
-let localDB
-let remoteDB
+const SYNC_URL = 'http://192.168.0.114:5984/remember'
 
 class Homescreen extends Component {
 
@@ -33,105 +32,56 @@ class Homescreen extends Component {
       debug: ""
     }
 
-    localDB = new PouchDB('localEntries')
-    this.changeHandler = localDB.changes({
-      since: 'now',
-      live: true,
-      include_docs: true,
-      attachments: true
-    }).on('change', () => {
+    //Function to be called whenever the local
+    //database reports a change
+    let updateFn = this.updateList.bind(this)
+
+    Database.connect(updateFn).then(() => {
       this.updateList()
-      //this.setState({debug: "Local Database Change"})
-    }).on('complete', (info) => {
-      //disconnect
-    }).on('error', (err) => {
-      this.setState({debug: '[!] Error updating local database: ' + err})
+      Database.startSync(SYNC_URL)
+    }).catch(err => {
+      this.setState({debug: '[!] Error reading local database: ' + err})
     })
 
-    remoteDB = new PouchDB('http://192.168.0.114:5984/remember')
-    this.syncHandler = localDB.sync(remoteDB, {
-      live: true,
-      retry: true,
-      attachments: true
-    }).on('change', (info) => {
-      this.setState({debug: "[+] Remote database change: " + info.change.start_time})
-    }).on('error', (err) => {
-      this.setState({debug: "[!] Remote database error: " + err})
-    })
-
-    this.updateList()
   }
 
   componentWillUnmount() {
-    //cancel listeners to prevent mem leaks
-    this.changeHandler.cancel();
-    this.syncHandler.cancel();
-    localDB.close()
-    remoteDB.close()
+    //Cancel listeners to prevent mem leaks.
+    //I do not know if this is necessary,
+    //I was getting warnings about too many listeners
+
+    Database.close()
   }
 
   updateList() {
 
-    localDB.allDocs({include_docs: true, attachments: true, descending: true})
-      .then(results => {
-        //this.setState({debug: '[+] Local db items: ' + items});
-        this.setState({
-          docs: results.rows.map(row => row.doc)
-        })
+    Database.all().then(results => {
+      this.setState({
+        docs: results.rows.map(row => row.doc)
       })
-      .catch(err => {
-        this.setState({debug: '[!] Error in local database: ' + err})
-        throw err
-      })
-
+    }).catch(err => {
+      this.setState({debug: '[!] Error in local database: ' + err})
+    })
   }
 
   updateItem(doc, newText, blob, type) {
 
-    let entry = {}
+    let newDoc = Database.buildDoc(doc, newText, blob, type)
 
-    this.setState({debug: "Blob type: " + type})
-    if (doc === null) { //It's new
-      entry = {
-        _id: Date.now().toString(),
-        body: newText
-      }
-    } else {
-      entry = {
-        _id: doc._id,
-        _rev: doc._rev,
-        body: newText,
-      }
-    }
-    if (blob !== null) {
-      entry._attachments = {
-        'image': {
-          content_type: type,
-          data: blob
-        }
-      }
-    }
-
-    localDB.put(entry).then( response => {
+    Database.update(newDoc).then(response => {
       this.setState({debug: '[+] OK -- updated item in db: ' + response.id})
     }).catch( err => {
       this.setState({debug: '[!] Error updating item: ' + err})
     })
-
   }
 
   deleteItem(row) {
 
-    localDB.remove(row)
-      .then( response => {
-        if (response.ok === true) {
-          this.setState({debug: "[+] OK -- Deleted: " + row._id})
-        }
-      })
-      .catch( err => {
-        this.setState({debug: "[!] Error deleting item: " + err})
-      })
-
+    Database.delete(row).then(response => {
+      this.setState({debug: "[+] OK -- Deleted: " + row._id})
+    }).catch(err => {
+      this.setState({debug: "[!] Error deleting item: " + err})
+    })
   }
 
   selectItem(row) {
@@ -141,7 +91,6 @@ class Homescreen extends Component {
       doc: row,
       updateFn: this.updateItem.bind(this)
     })
-
   }
 
   render() {
@@ -157,13 +106,12 @@ class Homescreen extends Component {
           onDelete={this.deleteItem.bind(this)}
         />
 
-        <NewEntryInput
+        <NewEntryButton
           onSelect={this.selectItem.bind(this, null)}
         />
 
       </View>
     )
-
   }
 
 }
