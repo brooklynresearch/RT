@@ -74,62 +74,62 @@ happen automatically.
 Skip this if you're already comfortable with react native
 
 ##### Basics
-    If you need a refresher on how React components work, I recommend looking at the
-    [official tutorial](https://facebook.github.io/react-native/docs/tutorial.html), particularly the
-    Props, State, and Style sections.
+If you need a refresher on how React components work, I recommend looking at the
+[official tutorial](https://facebook.github.io/react-native/docs/tutorial.html), particularly the
+Props, State, and Style sections.
 
 ##### Packager
-    You need to have the JS packager running. Open a terminal and run `npm start` in the project directory.
+You need to have the JS packager running. Open a terminal and run `npm start` in the project directory.
 
-    NOTE: it will also start up automatically in the background the first time you try to deploy the app
-    if it isn't running, but I prefer having it in its own terminal instead of in the background because
-    it often prints error messages you might not get otherwise.
+NOTE: it will also start up automatically in the background the first time you try to deploy the app
+if it isn't running, but I prefer having it in its own terminal instead of in the background because
+it often prints error messages you might not get otherwise.
 
 ##### Deploying
-    Once you get the "React packager ready" message from the packager you can do
+Once you get the "React packager ready" message from the packager you can do
 
-    `react-native run-android`
+`react-native run-android`
 
-    or
+or
 
-    `react-native run-ios`
+`react-native run-ios`
 
-    in a separate terminal session to get the app running on a device or emulator.
+in a separate terminal session to get the app running on a device or emulator.
 
 ##### Console Debugging
-    To see console logs, open a terminal window and run either
+To see console logs, open a terminal window and run either
 
-    `react-native log-android` 
+`react-native log-android` 
 
-    or 
+or 
 
-    `react-native log-ios`
+`react-native log-ios`
 
 ##### Live Reload
-    To enable live reloading when you save changes to source files, physically shake the device to bring up the
-    developer options and select it on the menu.
+To enable live reloading when you save changes to source files, physically shake the device to bring up the
+developer options and select it on the menu.
 
-    For activating this feature in an emulator, [see here](https://facebook.github.io/react-native/docs/debugging.html).
+For activating this feature in an emulator, [see here](https://facebook.github.io/react-native/docs/debugging.html).
 
-    That page covers various ways to debug react-native apps, including tools that let you inspect
-    rendered components. It's worth looking at the options available.
+That page covers various ways to debug react-native apps, including tools that let you inspect
+rendered components. It's worth looking at the options available.
 
-    Note: sometimes I notice that I need to save a file a 2-3 times before the live reload triggers.
-    This is still much much faster than going through the build/run process again each time though.
+Note: sometimes I notice that I need to save a file a 2-3 times before the live reload triggers.
+This is still much much faster than going through the build/run process again each time though.
 
 ##### Source Code Checker
-    I've included a config file for [eslint](https://eslint.org).
+I've included a config file for [eslint](https://eslint.org).
 
-    React is pretty good at telling you where and why something went
-    wrong, but using a strict checker like eslint can still be a big time saver since you can quickly use
-    it to find all the simple errors in a file instead of waiting for the app to start up and crash on each one.
+React is pretty good at telling you where and why something went
+wrong, but using a strict checker like eslint can still be a big time saver since you can quickly use
+it to find all the simple errors in a file instead of waiting for the app to start up and crash on each one.
 
-    I find it is particularly useful after making drastic changes to a file.
+I find it is particularly useful after making drastic changes to a file.
 
-    It is configured for a react native project so it will also apply rules specific to
-    react native code. 
+It is configured for a react native project so it will also apply rules specific to
+react native code. 
 
-    I recommend integrating it with your text editor. [Instructions here](https://eslint.org/docs/user-guide/integrations).
+I recommend integrating it with your text editor. [Instructions here](https://eslint.org/docs/user-guide/integrations).
 
 
 ### Project Files
