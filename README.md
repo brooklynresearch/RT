@@ -158,14 +158,14 @@ I recommend integrating it with your text editor. [Instructions here](https://es
 ### External Documentation
 
 ##### Core
-     * [React Native](http://facebook.github.io/react-native/docs/getting-started.html)
-     * [react-navigation](http://facebook.github.io/react-native/docs/navigation.html#react-navigation)
+  * [React Native](http://facebook.github.io/react-native/docs/getting-started.html)
+  * [react-navigation](http://facebook.github.io/react-native/docs/navigation.html#react-navigation)
 
 ##### Third-Party Packages
-     * [Pouchdb](https://pouchdb.com/api.html)
-     * [react-native-camera](https://github.com/lwansbrough/react-native-camera)
-     * [react-native-video](https://github.com/react-native-community/react-native-video)
-     * [react-native-fetch-blob](https://github.com/wkh237/react-native-fetch-blob)
+  * [Pouchdb](https://pouchdb.com/api.html)
+  * [react-native-camera](https://github.com/lwansbrough/react-native-camera)
+  * [react-native-video](https://github.com/react-native-community/react-native-video)
+  * [react-native-fetch-blob](https://github.com/wkh237/react-native-fetch-blob)
 
 ## Issues
   * Video file synchronization. Video files save locally on device with no issue, but
