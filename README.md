@@ -1,4 +1,4 @@
-# RememberThis
+# RT
 Proof of concept
 
 ## Installation
@@ -14,7 +14,7 @@ Proof of concept
 
 3. Extra npm packages
 
-   After cloning the repo, change to the RememberThis directory and run
+   After cloning the repo, change to the RT directory and run
    ```bash
    $ npm install
    ```
@@ -32,7 +32,7 @@ items in the database.
 
 On first run, there will be no database items so the Home screen will be mostly empty.
 
-Pressing the 'Remember This' button on the bottom takes you to the Update screen
+Pressing the 'RT' button on the bottom takes you to the Update screen
 where you can enter a title and add a photo or video (only one media item can be added
 for now.)
 
